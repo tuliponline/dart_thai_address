@@ -1,0 +1,4 @@
+name: ohochat_address
+
+packages:
+  - packages/**
