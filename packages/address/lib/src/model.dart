@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 class GeographyDTO {
   final int id;
   final int provinceCode;
@@ -35,7 +33,7 @@ class DatabaseSchema {
   final String districtName;
   final int subDistrictCode;
   final String subDistrictName;
-  final int postalCode;
+  final String postalCode;
 
   DatabaseSchema({
     required this.provinceCode,
@@ -46,13 +44,25 @@ class DatabaseSchema {
     required this.subDistrictName,
     required this.postalCode,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'provinceCode': provinceCode,
+      'provinceName': provinceName,
+      'districtCode': districtCode,
+      'districtName': districtName,
+      'subDistrictCode': subDistrictCode,
+      'subDistrictName': subDistrictName,
+      'postalCode': postalCode,
+    };
+  }
 }
 
 class DatabaseSchemaQuery {
   final int? provinceCode;
   final int? districtCode;
   final int? subDistrictCode;
-  final int? postalCode;
+  final String? postalCode;
   final String? provinceName;
   final String? districtName;
   final String? subDistrictName;
@@ -66,6 +76,18 @@ class DatabaseSchemaQuery {
     this.districtName,
     this.subDistrictName,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'provinceCode': provinceCode,
+      'provinceName': provinceName,
+      'districtCode': districtCode,
+      'districtName': districtName,
+      'subDistrictCode': subDistrictCode,
+      'subDistrictName': subDistrictName,
+      'postalCode': postalCode,
+    };
+  }
 }
 
 typedef MinifySubDistrictDatabase = (String, int, List<int>);

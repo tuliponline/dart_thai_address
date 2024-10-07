@@ -1,16 +1,19 @@
-import 'package:address/address.dart';
 import 'package:test/test.dart';
+
+import '../lib/address.dart';
 
 void main() {
   group('A group of tests', () {
-    final awesome = Awesome();
+    final location = Location();
+    location.init();
 
     setUp(() {
       // Additional setup goes here.
     });
 
     test('First Test', () {
-      expect(awesome.isAwesome, isTrue);
+      DatabaseSchemaQuery option = DatabaseSchemaQuery(postalCode: '10200');
+      print(location.execute(option));
     });
   });
 }

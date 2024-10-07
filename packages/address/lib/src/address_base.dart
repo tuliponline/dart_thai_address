@@ -1,35 +1,40 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'model.dart';
+import 'package:path/path.dart' as path;
+// typedef ReduceCallback<Init, Res> = (Init value, Res previousValue) => Res;
+// typedef MapCallback<Res> = (DatabaseSchema value) => Res;
 
-typedef ComposisCondition<T> = Predicate<T>;
-typedef DatabaseSchemaQuery = Map<String, dynamic>;
-typedef ReduceCallback<Init, Res> = (Init value, Res previousValue) => Res;
-typedef MapCallback<Res> = (DatabaseSchema value) => Res;
-
-
-class Location {
+class Location<T> {
   final List<DatabaseSchema> _database = [];
 
-  Location();
-
   void init() {
+    var jsonFile = "[]";
+
+    // var jsonFile = File('../../assets/minifyDB.json').readAsStringSync();
+
+    print(path.join('..', '..', 'assets'));
+
+    MinifyDatabase minifyDB = jsonDecode(jsonFile);
     if (_database.isEmpty) {
-      minifyDB.forEach((province) {
-        province[2].forEach((district) {
-          district[2].forEach((subDistrict) {
-            subDistrict[2].forEach((postalCode) {
-              _database.add({
-                'provinceName': province[0],
-                'provinceCode': province[1],
-                'districtName': district[0],
-                'districtCode': district[1],
-                'subDistrictName': subDistrict[0],
-                'subDistrictCode': subDistrict[1],
-                'postalCode': postalCode,
-              });
-            });
-          });
-        });
-      });
+      for (final province in minifyDB) {
+        for (final district in province.$3) {
+          for (final subDistrict in district.$3) {
+            for (final postalCode in subDistrict.$3) {
+              _database.add(DatabaseSchema(
+                provinceName: province.$1,
+                provinceCode: province.$2,
+                districtName: district.$1,
+                districtCode: district.$2,
+                subDistrictName: subDistrict.$1,
+                subDistrictCode: subDistrict.$2,
+                postalCode: '$postalCode',
+              ));
+            }
+          }
+        }
+      }
     }
   }
 
@@ -47,18 +52,20 @@ class Location {
     final queries = <ComposisCondition<DatabaseSchema>>[];
 
     if (option != null) {
-      for (final entry in option.entries) {
-        if (!entry.value) continue;
-
+      for (final entry in option.toJson().entries) {
+        if (entry.value == null) continue;
         queries.add((row) {
+          final rowJson = row.toJson();
           return ['provinceCode', 'districtCode', 'subDistrictCode']
                   .contains(entry.key)
-              ? row[entry.key] == entry.value
+              ? rowJson[entry.key] == entry.value
               : ['provinceName', 'districtName', 'subDistrictName']
                       .contains(entry.key)
-                  ? row[entry.key].toString().startsWith(entry.value.toString())
+                  ? rowJson[entry.key]
+                      .toString()
+                      .startsWith(entry.value.toString())
                   : entry.key == 'postalCode'
-                      ? row[entry.key]
+                      ? rowJson[entry.key]
                           .toString()
                           .startsWith(entry.value.toString())
                       : false;
@@ -74,53 +81,50 @@ class Location {
     return null;
   }
 
-  List<DatabaseSchema> execute(DatabaseSchemaQuery option) {
+  List<T> execute(DatabaseSchemaQuery option, [String? message]) {
+    print(_database);
     final res = combineQuery(createQueryArray(option));
-    return res;
+    return res as List<T>;
   }
 
-  Res? map<T, Res>(DatabaseSchemaQuery option,
-      {required MapCallback<Res> callback}) {
+  // ignore: avoid_shadowing_type_parameters
+  List<T> map<T, Res>(DatabaseSchemaQuery option, MapCallback<Res> callback) {
     final queries = createQueryArray(option);
     final res = combineQuery(queries);
 
     if (res.isNotEmpty) {
       return res.map(callback as Function(DatabaseSchema e)).firstOrNull();
     }
-    return null;
+    return [] as List<T>;
   }
 
-  Init? reduce<T, Res, Init>(DatabaseSchemaQuery option,
-      {required ReduceCallback<Init, Res> callback, required Init init}) {
-    final queries = createQueryArray(option);
-    final res = combineQuery(queries);
+  // reduce<T, Res, Init>(DatabaseSchemaQuery option,
+  //     ReduceCallback<Init, Res> callback, Init init) {
+  //   final queries = createQueryArray(option);
+  //   final res = combineQuery(queries);
 
-    if (res.isNotEmpty) {
-      return res.reduce(callback, init);
-    }
-    return null;
-  }
+  //   if (res.isNotEmpty) {
+  //     return res.reduce(callback, init);
+  //   }
+  //   return null;
+  // }
+}
 
-  void main() async {
-    // Usage example:
-    Location location = Location();
-    location.init();
+void main() async {
+  // Usage example:
+  Location location = Location();
+  location.init();
 
-    DatabaseSchemaQuery option = {
-      'provinceName': 'Bangkok',
-      'postalCode': '10200'
-    };
+  DatabaseSchemaQuery option =
+      DatabaseSchemaQuery(provinceName: 'Bangkok', postalCode: '10200');
+  print(location.execute(option));
 
-    List<DatabaseSchema> result = location.execute(option);
-    print(result);
+  // Res? res1 =
+  //     await location.map(option, callback: (value) => value['districtName']);
+  // print(res1);
 
-    Res? res1 =
-        await location.map(option, callback: (value) => value['districtName']);
-    print(res1);
-
-    Init? init1 = 10;
-    Result? res2 = await location.reduce<T, Res, Init>(option,
-        callback: (value, previousValue) => value + previousValue, init: init1);
-    print(res2);
-  }
+  // Init? init1 = 10;
+  // Result? res2 = await location.reduce<T, Res, Init>(option,
+  //     callback: (value, previousValue) => value + previousValue, init: init1);
+  // print(res2);
 }
