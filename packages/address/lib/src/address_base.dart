@@ -1,22 +1,32 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'model.dart';
-import 'package:path/path.dart' as path;
-// typedef ReduceCallback<Init, Res> = (Init value, Res previousValue) => Res;
-// typedef MapCallback<Res> = (DatabaseSchema value) => Res;
+import 'package:flutter/services.dart';
 
 class Location<T> {
   final List<DatabaseSchema> _database = [];
 
-  void init() {
-    var jsonFile = "[]";
+  Future<void> init() async {
+    String jsonFile = await rootBundle.loadString('packages/address_flutter/assets/minifyDB.json');
+    var decodedJson = jsonDecode(jsonFile) as List<dynamic>;
 
-    // var jsonFile = File('../../assets/minifyDB.json').readAsStringSync();
+    MinifyDatabase minifyDB = decodedJson.map((province) {
+      String provinceName = province[0];
+      int provinceId = province[1];
+      List<MinifyDistrictDatabase> districts = (province[2] as List<dynamic>).map((district) {
+        String districtName = district[0];
+        int districtId = district[1];
+        List<MinifySubDistrictDatabase> subDistricts = (district[2] as List<dynamic>).map((subDistrict) {
+          String subDistrictName = subDistrict[0];
+          int subDistrictId = subDistrict[1];
+          List<int> postCodes = List<int>.from(subDistrict[2]);
+          return (subDistrictName, subDistrictId, postCodes);
+        }).toList();
+        return (districtName, districtId, subDistricts);
+      }).toList();
+      return (provinceName, provinceId, districts);
+    }).toList();
 
-    print(path.join('..', '..', 'assets'));
-
-    MinifyDatabase minifyDB = jsonDecode(jsonFile);
     if (_database.isEmpty) {
       for (final province in minifyDB) {
         for (final district in province.$3) {
@@ -40,15 +50,11 @@ class Location<T> {
 
   List<DatabaseSchema> get database => _database;
 
-  List<DatabaseSchema> combineQuery(
-      List<ComposisCondition<DatabaseSchema>> queries) {
-    return _database
-        .where((row) => queries.every((query) => query(row)))
-        .toList();
+  List<DatabaseSchema> combineQuery(List<ComposisCondition<DatabaseSchema>> queries) {
+    return _database.where((row) => queries.every((query) => query(row))).toList();
   }
 
-  List<ComposisCondition<DatabaseSchema>> createQueryArray(
-      DatabaseSchemaQuery? option) {
+  List<ComposisCondition<DatabaseSchema>> createQueryArray(DatabaseSchemaQuery? option) {
     final queries = <ComposisCondition<DatabaseSchema>>[];
 
     if (option != null) {
@@ -56,18 +62,12 @@ class Location<T> {
         if (entry.value == null) continue;
         queries.add((row) {
           final rowJson = row.toJson();
-          return ['provinceCode', 'districtCode', 'subDistrictCode']
-                  .contains(entry.key)
+          return ['provinceCode', 'districtCode', 'subDistrictCode'].contains(entry.key)
               ? rowJson[entry.key] == entry.value
-              : ['provinceName', 'districtName', 'subDistrictName']
-                      .contains(entry.key)
-                  ? rowJson[entry.key]
-                      .toString()
-                      .startsWith(entry.value.toString())
+              : ['provinceName', 'districtName', 'subDistrictName'].contains(entry.key)
+                  ? rowJson[entry.key].toString().startsWith(entry.value.toString())
                   : entry.key == 'postalCode'
-                      ? rowJson[entry.key]
-                          .toString()
-                          .startsWith(entry.value.toString())
+                      ? rowJson[entry.key].toString().startsWith(entry.value.toString())
                       : false;
         });
       }
@@ -82,7 +82,6 @@ class Location<T> {
   }
 
   List<T> execute(DatabaseSchemaQuery option, [String? message]) {
-    print(_database);
     final res = combineQuery(createQueryArray(option));
     return res as List<T>;
   }
@@ -97,34 +96,4 @@ class Location<T> {
     }
     return [] as List<T>;
   }
-
-  // reduce<T, Res, Init>(DatabaseSchemaQuery option,
-  //     ReduceCallback<Init, Res> callback, Init init) {
-  //   final queries = createQueryArray(option);
-  //   final res = combineQuery(queries);
-
-  //   if (res.isNotEmpty) {
-  //     return res.reduce(callback, init);
-  //   }
-  //   return null;
-  // }
-}
-
-void main() async {
-  // Usage example:
-  Location location = Location();
-  location.init();
-
-  DatabaseSchemaQuery option =
-      DatabaseSchemaQuery(provinceName: 'Bangkok', postalCode: '10200');
-  print(location.execute(option));
-
-  // Res? res1 =
-  //     await location.map(option, callback: (value) => value['districtName']);
-  // print(res1);
-
-  // Init? init1 = 10;
-  // Result? res2 = await location.reduce<T, Res, Init>(option,
-  //     callback: (value, previousValue) => value + previousValue, init: init1);
-  // print(res2);
 }
