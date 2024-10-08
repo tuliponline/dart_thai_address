@@ -9,7 +9,7 @@ class Location {
 
   Location._() {
     rootBundle
-        .loadString('packages/ohochat_address/assets/minifyDB.json')
+        .loadString('packages/ohochat_address/assets/minify_db.json')
         .then((jsonFile) {
       var decodedJson = jsonDecode(jsonFile);
       MinifyDatabase minifyDB = (decodedJson as List<dynamic>).map((province) {
