@@ -226,7 +226,6 @@ class AutocompleteB extends StatelessWidget {
       initialValue: TextEditingValue(text: initialValue),
       onSelected: onSelected,
       optionsBuilder: (textEditingValue) {
-        print(textEditingValue.text);
         if (textEditingValue.text.isEmpty) {
           return items;
         }
@@ -283,6 +282,9 @@ class AutocompleteB extends StatelessWidget {
           focusNode: focusNode,
           onTapOutside: (event) {
             onSelected!(textEditingController.text);
+          },
+          onChanged: (value) {
+            if (value.isEmpty) onSelected!('');
           },
           decoration: const InputDecoration(
             filled: true,
