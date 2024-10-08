@@ -8,7 +8,9 @@ class Location {
   static final Location _instance = Location._();
 
   Location._() {
-    rootBundle.loadString('packages/address_flutter/assets/minifyDB.json').then((jsonFile) {
+    rootBundle
+        .loadString('packages/ohochat_address/assets/minifyDB.json')
+        .then((jsonFile) {
       var decodedJson = jsonDecode(jsonFile);
       MinifyDatabase minifyDB = (decodedJson as List<dynamic>).map((province) {
         return (
@@ -58,11 +60,15 @@ class Location {
 
   List<DatabaseSchema> get database => _database;
 
-  List<DatabaseSchema> combineQuery(List<ComposisCondition<DatabaseSchema>> queries) {
-    return _database.where((row) => queries.every((query) => query(row))).toList();
+  List<DatabaseSchema> combineQuery(
+      List<ComposisCondition<DatabaseSchema>> queries) {
+    return _database
+        .where((row) => queries.every((query) => query(row)))
+        .toList();
   }
 
-  List<ComposisCondition<DatabaseSchema>> createQueryArray(DatabaseSchemaQuery? option) {
+  List<ComposisCondition<DatabaseSchema>> createQueryArray(
+      DatabaseSchemaQuery? option) {
     final queries = <ComposisCondition<DatabaseSchema>>[];
 
     if (option != null) {
@@ -70,12 +76,18 @@ class Location {
         if (entry.value == null) continue;
         queries.add((row) {
           final rowJson = row.toJson();
-          return ['provinceCode', 'districtCode', 'subDistrictCode'].contains(entry.key)
+          return ['provinceCode', 'districtCode', 'subDistrictCode']
+                  .contains(entry.key)
               ? rowJson[entry.key] == entry.value
-              : ['provinceName', 'districtName', 'subDistrictName'].contains(entry.key)
-                  ? rowJson[entry.key].toString().startsWith(entry.value.toString())
+              : ['provinceName', 'districtName', 'subDistrictName']
+                      .contains(entry.key)
+                  ? rowJson[entry.key]
+                      .toString()
+                      .startsWith(entry.value.toString())
                   : entry.key == 'postalCode'
-                      ? rowJson[entry.key].toString().startsWith(entry.value.toString())
+                      ? rowJson[entry.key]
+                          .toString()
+                          .startsWith(entry.value.toString())
                       : false;
         });
       }
@@ -104,7 +116,8 @@ class Location {
     return [] as List<T>;
   }
 
-  reduce<Init>(DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
+  reduce<Init>(
+      DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
     final queries = createQueryArray(option);
     final res = combineQuery(queries);
 

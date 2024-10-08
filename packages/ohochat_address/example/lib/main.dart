@@ -1,4 +1,4 @@
-import 'package:address_dart/ohochat_address.dart';
+import 'package:ohochat_address/ohochat_address.dart';
 import 'package:flutter/material.dart';
 
 void main() {
