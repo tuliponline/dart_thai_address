@@ -2,10 +2,13 @@ name: address_dart
 description: "A new Flutter package project."
 version: 0.0.1
 
+repository: https://github.com/ohoexperience/dart_address/tree/main/packages/address
 environment:
   sdk: ^3.5.3
 
 dependencies:
+  flutter:
+    sdk: flutter
   path: ^1.9.0
 
 dev_dependencies:
