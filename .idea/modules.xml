@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/packages/address/melos_dart_address.iml" filepath="$PROJECT_DIR$/packages/address/melos_dart_address.iml" />
       <module fileurl="file://$PROJECT_DIR$/melos_ohochat_address.iml" filepath="$PROJECT_DIR$/melos_ohochat_address.iml" />
     </modules>
   </component>

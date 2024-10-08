@@ -1,22 +1,25 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'model.dart';
-import 'package:flutter/services.dart';
 
-class Location<T> {
+class Location {
   final List<DatabaseSchema> _database = [];
+  static final Location _instance = Location._();
 
-  Future<void> init() async {
-    String jsonFile = await rootBundle.loadString('packages/address_flutter/assets/minifyDB.json');
-    var decodedJson = jsonDecode(jsonFile) as List<dynamic>;
+  Location._() {
+    var jsonFile = File('minifyDB.json').readAsStringSync();
+    var decodedJson = jsonDecode(jsonFile);
 
     MinifyDatabase minifyDB = decodedJson.map((province) {
       String provinceName = province[0];
       int provinceId = province[1];
-      List<MinifyDistrictDatabase> districts = (province[2] as List<dynamic>).map((district) {
+      List<MinifyDistrictDatabase> districts =
+          (province[2] as List<dynamic>).map((district) {
         String districtName = district[0];
         int districtId = district[1];
-        List<MinifySubDistrictDatabase> subDistricts = (district[2] as List<dynamic>).map((subDistrict) {
+        List<MinifySubDistrictDatabase> subDistricts =
+            (district[2] as List<dynamic>).map((subDistrict) {
           String subDistrictName = subDistrict[0];
           int subDistrictId = subDistrict[1];
           List<int> postCodes = List<int>.from(subDistrict[2]);
@@ -48,13 +51,21 @@ class Location<T> {
     }
   }
 
-  List<DatabaseSchema> get database => _database;
-
-  List<DatabaseSchema> combineQuery(List<ComposisCondition<DatabaseSchema>> queries) {
-    return _database.where((row) => queries.every((query) => query(row))).toList();
+  factory Location() {
+    return _instance;
   }
 
-  List<ComposisCondition<DatabaseSchema>> createQueryArray(DatabaseSchemaQuery? option) {
+  List<DatabaseSchema> get database => _database;
+
+  List<DatabaseSchema> combineQuery(
+      List<ComposisCondition<DatabaseSchema>> queries) {
+    return _database
+        .where((row) => queries.every((query) => query(row)))
+        .toList();
+  }
+
+  List<ComposisCondition<DatabaseSchema>> createQueryArray(
+      DatabaseSchemaQuery? option) {
     final queries = <ComposisCondition<DatabaseSchema>>[];
 
     if (option != null) {
@@ -62,12 +73,18 @@ class Location<T> {
         if (entry.value == null) continue;
         queries.add((row) {
           final rowJson = row.toJson();
-          return ['provinceCode', 'districtCode', 'subDistrictCode'].contains(entry.key)
+          return ['provinceCode', 'districtCode', 'subDistrictCode']
+                  .contains(entry.key)
               ? rowJson[entry.key] == entry.value
-              : ['provinceName', 'districtName', 'subDistrictName'].contains(entry.key)
-                  ? rowJson[entry.key].toString().startsWith(entry.value.toString())
+              : ['provinceName', 'districtName', 'subDistrictName']
+                      .contains(entry.key)
+                  ? rowJson[entry.key]
+                      .toString()
+                      .startsWith(entry.value.toString())
                   : entry.key == 'postalCode'
-                      ? rowJson[entry.key].toString().startsWith(entry.value.toString())
+                      ? rowJson[entry.key]
+                          .toString()
+                          .startsWith(entry.value.toString())
                       : false;
         });
       }
@@ -81,19 +98,30 @@ class Location<T> {
     return null;
   }
 
-  List<T> execute(DatabaseSchemaQuery option, [String? message]) {
+  List<T> execute<T>(DatabaseSchemaQuery option) {
     final res = combineQuery(createQueryArray(option));
     return res as List<T>;
   }
 
-  // ignore: avoid_shadowing_type_parameters
-  List<T> map<T, Res>(DatabaseSchemaQuery option, MapCallback<Res> callback) {
+  List<T> map<T>(DatabaseSchemaQuery option, MapCallback<T> callback) {
     final queries = createQueryArray(option);
     final res = combineQuery(queries);
 
     if (res.isNotEmpty) {
-      return res.map(callback as Function(DatabaseSchema e)).firstOrNull();
+      return res.map(callback).toList();
     }
     return [] as List<T>;
+  }
+
+  reduce<Init>(
+      DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
+    final queries = createQueryArray(option);
+    final res = combineQuery(queries);
+
+    if (res.isNotEmpty) {
+      return res.fold<Init>(init, callback);
+    }
+
+    return null;
   }
 }
