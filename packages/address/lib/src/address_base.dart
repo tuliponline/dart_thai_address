@@ -1,54 +1,55 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'model.dart';
+
+import 'package:flutter/services.dart';
 
 class Location {
   final List<DatabaseSchema> _database = [];
   static final Location _instance = Location._();
 
   Location._() {
-    var jsonFile = File('minifyDB.json').readAsStringSync();
-    var decodedJson = jsonDecode(jsonFile);
-
-    MinifyDatabase minifyDB = decodedJson.map((province) {
-      String provinceName = province[0];
-      int provinceId = province[1];
-      List<MinifyDistrictDatabase> districts =
+    rootBundle.loadString('packages/address_flutter/assets/minifyDB.json').then((jsonFile) {
+      var decodedJson = jsonDecode(jsonFile);
+      MinifyDatabase minifyDB = (decodedJson as List<dynamic>).map((province) {
+        return (
+          province[0] as String,
+          province[1] as int,
           (province[2] as List<dynamic>).map((district) {
-        String districtName = district[0];
-        int districtId = district[1];
-        List<MinifySubDistrictDatabase> subDistricts =
-            (district[2] as List<dynamic>).map((subDistrict) {
-          String subDistrictName = subDistrict[0];
-          int subDistrictId = subDistrict[1];
-          List<int> postCodes = List<int>.from(subDistrict[2]);
-          return (subDistrictName, subDistrictId, postCodes);
-        }).toList();
-        return (districtName, districtId, subDistricts);
+            return (
+              district[0] as String,
+              district[1] as int,
+              (district[2] as List<dynamic>).map((subDistrict) {
+                return (
+                  subDistrict[0] as String,
+                  subDistrict[1] as int,
+                  List<int>.from(subDistrict[2] as List<dynamic>)
+                );
+              }).toList()
+            );
+          }).toList()
+        );
       }).toList();
-      return (provinceName, provinceId, districts);
-    }).toList();
 
-    if (_database.isEmpty) {
-      for (final province in minifyDB) {
-        for (final district in province.$3) {
-          for (final subDistrict in district.$3) {
-            for (final postalCode in subDistrict.$3) {
-              _database.add(DatabaseSchema(
-                provinceName: province.$1,
-                provinceCode: province.$2,
-                districtName: district.$1,
-                districtCode: district.$2,
-                subDistrictName: subDistrict.$1,
-                subDistrictCode: subDistrict.$2,
-                postalCode: '$postalCode',
-              ));
+      if (_database.isEmpty) {
+        for (final province in minifyDB) {
+          for (final district in province.$3) {
+            for (final subDistrict in district.$3) {
+              for (final postalCode in subDistrict.$3) {
+                _database.add(DatabaseSchema(
+                  provinceName: province.$1,
+                  provinceCode: province.$2,
+                  districtName: district.$1,
+                  districtCode: district.$2,
+                  subDistrictName: subDistrict.$1,
+                  subDistrictCode: subDistrict.$2,
+                  postalCode: '$postalCode',
+                ));
+              }
             }
           }
         }
       }
-    }
+    });
   }
 
   factory Location() {
@@ -57,15 +58,11 @@ class Location {
 
   List<DatabaseSchema> get database => _database;
 
-  List<DatabaseSchema> combineQuery(
-      List<ComposisCondition<DatabaseSchema>> queries) {
-    return _database
-        .where((row) => queries.every((query) => query(row)))
-        .toList();
+  List<DatabaseSchema> combineQuery(List<ComposisCondition<DatabaseSchema>> queries) {
+    return _database.where((row) => queries.every((query) => query(row))).toList();
   }
 
-  List<ComposisCondition<DatabaseSchema>> createQueryArray(
-      DatabaseSchemaQuery? option) {
+  List<ComposisCondition<DatabaseSchema>> createQueryArray(DatabaseSchemaQuery? option) {
     final queries = <ComposisCondition<DatabaseSchema>>[];
 
     if (option != null) {
@@ -73,18 +70,12 @@ class Location {
         if (entry.value == null) continue;
         queries.add((row) {
           final rowJson = row.toJson();
-          return ['provinceCode', 'districtCode', 'subDistrictCode']
-                  .contains(entry.key)
+          return ['provinceCode', 'districtCode', 'subDistrictCode'].contains(entry.key)
               ? rowJson[entry.key] == entry.value
-              : ['provinceName', 'districtName', 'subDistrictName']
-                      .contains(entry.key)
-                  ? rowJson[entry.key]
-                      .toString()
-                      .startsWith(entry.value.toString())
+              : ['provinceName', 'districtName', 'subDistrictName'].contains(entry.key)
+                  ? rowJson[entry.key].toString().startsWith(entry.value.toString())
                   : entry.key == 'postalCode'
-                      ? rowJson[entry.key]
-                          .toString()
-                          .startsWith(entry.value.toString())
+                      ? rowJson[entry.key].toString().startsWith(entry.value.toString())
                       : false;
         });
       }
@@ -113,8 +104,7 @@ class Location {
     return [] as List<T>;
   }
 
-  reduce<Init>(
-      DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
+  reduce<Init>(DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
     final queries = createQueryArray(option);
     final res = combineQuery(queries);
 
