@@ -10,7 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   path: ^1.9.0
-
+  resource_importer: ^0.2.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -19,3 +20,9 @@ dev_dependencies:
 flutter:
   assets:
       - assets/minify_db.json
+
+resource_importer:
+  resources:
+    rawDB: 
+      path: 'assets/minify_db.json'
+      type: String

@@ -1,57 +1,54 @@
 import 'dart:convert';
-import 'model.dart';
 
-import 'package:flutter/services.dart';
+import 'package:ohochat_address/resources.resource_importer.dart';
+
+import 'model.dart';
 
 class Location {
   final List<DatabaseSchema> _database = [];
   static final Location _instance = Location._();
 
   Location._() {
-    rootBundle
-        .loadString('packages/ohochat_address/assets/minify_db.json')
-        .then((jsonFile) {
-      var decodedJson = jsonDecode(jsonFile);
-      MinifyDatabase minifyDB = (decodedJson as List<dynamic>).map((province) {
-        return (
-          province[0] as String,
-          province[1] as int,
-          (province[2] as List<dynamic>).map((district) {
-            return (
-              district[0] as String,
-              district[1] as int,
-              (district[2] as List<dynamic>).map((subDistrict) {
-                return (
-                  subDistrict[0] as String,
-                  subDistrict[1] as int,
-                  List<int>.from(subDistrict[2] as List<dynamic>)
-                );
-              }).toList()
-            );
-          }).toList()
-        );
-      }).toList();
+    var decodedJson = jsonDecode(rawDB);
+    MinifyDatabase minifyDB = (decodedJson as List<dynamic>).map((province) {
+      return (
+        province[0] as String,
+        province[1] as int,
+        (province[2] as List<dynamic>).map((district) {
+          return (
+            district[0] as String,
+            district[1] as int,
+            (district[2] as List<dynamic>).map((subDistrict) {
+              return (
+                subDistrict[0] as String,
+                subDistrict[1] as int,
+                List<int>.from(subDistrict[2] as List<dynamic>)
+              );
+            }).toList()
+          );
+        }).toList()
+      );
+    }).toList();
 
-      if (_database.isEmpty) {
-        for (final province in minifyDB) {
-          for (final district in province.$3) {
-            for (final subDistrict in district.$3) {
-              for (final postalCode in subDistrict.$3) {
-                _database.add(DatabaseSchema(
-                  provinceName: province.$1,
-                  provinceCode: province.$2,
-                  districtName: district.$1,
-                  districtCode: district.$2,
-                  subDistrictName: subDistrict.$1,
-                  subDistrictCode: subDistrict.$2,
-                  postalCode: '$postalCode',
-                ));
-              }
+    if (_database.isEmpty) {
+      for (final province in minifyDB) {
+        for (final district in province.$3) {
+          for (final subDistrict in district.$3) {
+            for (final postalCode in subDistrict.$3) {
+              _database.add(DatabaseSchema(
+                provinceName: province.$1,
+                provinceCode: province.$2,
+                districtName: district.$1,
+                districtCode: district.$2,
+                subDistrictName: subDistrict.$1,
+                subDistrictCode: subDistrict.$2,
+                postalCode: '$postalCode',
+              ));
             }
           }
         }
       }
-    });
+    }
   }
 
   factory Location() {
