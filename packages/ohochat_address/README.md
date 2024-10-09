@@ -31,14 +31,6 @@ To install the package, add it to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  ohochat_address: ^1.0.0
-```
-## Getting Started
-
-To install the package, add it to your `pubspec.yaml` file:
-
-```yaml
-dependencies:
   ohochat_address: latest
 ```
 ## Location
@@ -172,7 +164,7 @@ const results3 = location.reduce(
         districtName: 'บางนา',
     ),
     (acc, row) => {
-        acc.add(row.provinceName)
+        acc['provinceName'].add(row.provinceName)
         return acc
     },
     {
@@ -208,4 +200,4 @@ const results3 = location.reduce(
 
 ## Data Source
 
-The address data is sourced from and managed by thailand-geography-json. Kudos to the team for their great work!
+The address data is sourced from and managed by [thailand-geography-json](https://github.com/thailand-geography-data/thailand-geography-json). Kudos to the team for their great works!
