@@ -1,6 +1,6 @@
 name: ohochat_address
 description: "A no-nonsense Thailand address helper."
-version: 0.0.1
+version: 0.0.1+rc
 
 repository: https://github.com/ohoexperience/dart_address/tree/main/packages/address
 environment:
