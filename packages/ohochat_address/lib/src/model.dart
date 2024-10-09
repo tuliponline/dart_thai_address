@@ -1,16 +1,4 @@
 class GeographyDTO {
-  final int id;
-  final int provinceCode;
-  final String provinceNameEn;
-  final String provinceNameTh;
-  final int districtCode;
-  final String districtNameEn;
-  final String districtNameTh;
-  final int subdistrictCode;
-  final String subdistrictNameEn;
-  final String subdistrictNameTh;
-  final int postalCode;
-
   GeographyDTO({
     required this.id,
     required this.provinceCode,
@@ -24,17 +12,20 @@ class GeographyDTO {
     required this.subdistrictNameTh,
     required this.postalCode,
   });
+  final int id;
+  final int provinceCode;
+  final String provinceNameEn;
+  final String provinceNameTh;
+  final int districtCode;
+  final String districtNameEn;
+  final String districtNameTh;
+  final int subdistrictCode;
+  final String subdistrictNameEn;
+  final String subdistrictNameTh;
+  final int postalCode;
 }
 
 class DatabaseSchema {
-  final int provinceCode;
-  final String provinceName;
-  final int districtCode;
-  final String districtName;
-  final int subDistrictCode;
-  final String subDistrictName;
-  final String postalCode;
-
   DatabaseSchema({
     required this.provinceCode,
     required this.provinceName,
@@ -44,6 +35,13 @@ class DatabaseSchema {
     required this.subDistrictName,
     required this.postalCode,
   });
+  final int provinceCode;
+  final String provinceName;
+  final int districtCode;
+  final String districtName;
+  final int subDistrictCode;
+  final String subDistrictName;
+  final String postalCode;
 
   Map<String, dynamic> toJson() {
     return {
@@ -59,14 +57,6 @@ class DatabaseSchema {
 }
 
 class DatabaseSchemaQuery {
-  final int? provinceCode;
-  final int? districtCode;
-  final int? subDistrictCode;
-  final String? postalCode;
-  final String? provinceName;
-  final String? districtName;
-  final String? subDistrictName;
-
   DatabaseSchemaQuery({
     this.provinceCode,
     this.districtCode,
@@ -76,6 +66,13 @@ class DatabaseSchemaQuery {
     this.districtName,
     this.subDistrictName,
   });
+  final int? provinceCode;
+  final int? districtCode;
+  final int? subDistrictCode;
+  final String? postalCode;
+  final String? provinceName;
+  final String? districtName;
+  final String? subDistrictName;
 
   Map<String, dynamic> toJson() {
     return {
