@@ -1,52 +1,56 @@
 # Address for Thailand
 
-[![NPM Version](https://img.shields.io/npm/v/@ohochat/address.svg?style=flat)](https://www.npmjs.com/package/@ohochat/address)
-[![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
+[![pub package](https://img.shields.io/pub/v/ohochat_address.svg?style=flat)](https://pub.dev/packages/ohochat_address)
+[![Flutter](https://img.shields.io/badge/Platform-Flutter-blue.svg)](https://flutter.dev)
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/@ohochat/address)
-](https://www.npmjs.com/package/@ohochat/address)
+[![Pub points](https://img.shields.io/pub/points/ohochat_address)](https://pub.dev/packages/ohochat_address/score)
 
-Introducing `address` — a no-nonsense Thailand address helper.
+Introducing `ohochat_address` — a no-nonsense Thailand address helper for Flutter.
 
-This lightweight package empowers you to focus on building address features faster, rather than wrestling with complexity of address handling. It embraces framework-agnostic and isomorphic design — meaning it can be used with any libraries and works on both client and server out-of-the-box.
+This lightweight package empowers you to focus on building address features faster, eliminating the complexity of address handling. It is framework-agnostic and works seamlessly across platforms in any Flutter application.
 
 With this package, you can effortlessly:
 
-* Leverage pre-built relationships between address components
-* Filter addresses by various criteria e.g. postcode, province, district and sub district.
-* Build robust address-based applications without worrying about the underlying complexity
+- Use pre-built relationships between address components.
+- Filter addresses by criteria like postcode, province, district, and sub-district.
+- Build robust address-based applications without worrying about the underlying complexity.
 
-By using `address`, you'll enjoy a more streamlined development experience and deliver high-quality results faster.
+This package is designed and brought to you by [Oho Chat](https://www.oho.chat) — the No. 1 customer support and sales management platform!
 
+## Features
 
-This package is designed and brought to you by [Oho Chat](https://www.oho.chat) — the No. 1 customer support and sale management platform! 
+By using `ohochat_address`, you'll enjoy:
+
+- Efficient address lookup for Thai provinces, districts, and sub-districts.
+- Flexible queries that handle both partial and exact address matching.
+- Compatibility with Flutter’s mobile, web, and desktop apps.
 
 ## Getting Started
 
-Install the package:
+To install the package, add it to your `pubspec.yaml` file:
 
-```bash
-# npm
-npm i @ohochat/address
-
-# yarn
-yarn add @ohochat/address
-
-# pnpm
-pnpm i @ohochat/address
+```yaml
+dependencies:
+  ohochat_address: ^1.0.0
 ```
+## Getting Started
 
+To install the package, add it to your `pubspec.yaml` file:
 
+```yaml
+dependencies:
+  ohochat_address: latest
+```
 ## Location
 
 Use **Location** to find addresses with search constraints.
 
 ### Creating an instance
 
-```typescript
-import { Location } from '@ohochat/address';
+```dart
+import 'package:ohochat_address/ohochat_address.dart';
 
-const location = new Location();
+final location = Location();
 ```
 
 You can create a new instance of **Location**. A Location let you query addresses based on your criteria, resulting in one or more matched addresses (or zero if not matched!). An address is made up from the following **components**:
@@ -66,25 +70,20 @@ These components can be refered to by a standardized numerical code in 2, 4 and 
 
 Find addresses using queries. The resulting addresses can be passed to mapping or map-reduce function for convenience.
 
-```typescript
+```dart
 // Find address
-Location.execute(query)
-Location.execute(query, callback) // map results
-Location.execute(query, callback, initialValue) // map reduce results
+import 'package:ohochat_address/ohochat_address.dart';
 
-// Example Result
-[
-    {
-        postalCode: 10270,
-        provinceCode: 11,
-        provinceName: 'สมุทรปราการ',
-        districtCode: 1101,
-        districtName: 'เมืองสมุทรปราการ',
-        subDistrictCode: 110101,
-        subDistrictName: 'ปากน้ำ',
-    },
-    // ... more addresses
-]
+void main() {
+  final location = Location();
+  
+  final results = location.execute(DatabaseSchemaQuery(
+    postalCode: 10270,
+    subDistrictName: 'ปากน้ำ',
+  ));
+
+  print(results);
+}
 ```
 
 #### Location Query
@@ -96,20 +95,20 @@ These are the available query options for searching by address components or cod
 
 You can mix exact and partial matches in a single query. Otherwise, you can pass `{}` and get all of the addresses (why not!).
 
-```typescript
+```
 
 
 {
     // 1. Exact match using MOI code
 
     // provinceCode in 2 digits like 11
-    provinceCode?: number
+    provinceCode?: int
 
     // districtCode in 4 digits like 1101
-    districtCode?: number
+    districtCode?: int
 
     // subDistrictCode in 6 digits like 110101
-    subDistrictCode?: number
+    subDistrictCode?: int
 
     // 2. Partial match using address component
 
@@ -123,18 +122,17 @@ You can mix exact and partial matches in a single query. Otherwise, you can pass
     subDistrictName?: string
 
     // postal code beginning with 10
-    postalCode?: number
+    postalCode?: string
 }
 ```
 
 
 ### Use Cases
-```typescript
+```dart
 // Get address details
-const results1 = location.execute({
-    postalCode: 10270,
-    subDistrictName: 'ปากน้ำ',
-})
+final results = location.execute(DatabaseSchemaQuery(postalCode: '10270',provinceName:'สมุทร'));
+
+
 
 // results1
 [
@@ -151,12 +149,12 @@ const results1 = location.execute({
 
 
 // Get address details and mapping data
-const results2 = location.execute(
-    {
+const results2 = location.reduce(
+    DatabaseSchemaQuery(
         provinceName: 'กรุง',
         districtName: 'บางนา',
         subDistrictName: 'บางนาใต้',
-    },
+    ),
     (row) => ({ a: `${row.provinceName} ${row.postalCode}` }),
 )
 // results2
@@ -168,19 +166,21 @@ const results2 = location.execute(
 
 
 // Get address detail and restucture data
-const results3 = location.execute(
-    {
+const results3 = location.reduce(
+     DatabaseSchemaQuery(
         provinceName: 'กรุง',
         districtName: 'บางนา',
-    },
+    ),
     (acc, row) => {
         acc.add(row.provinceName)
         return acc
     },
-    new Set<string>(),
+    {
+        "provinceName": <String>{},
+    }
 )
 // results3
-Set(1) { 'กรุงเทพมหานคร' }
+{ "provinceName" : ({ 'กรุงเทพมหานคร' })}
 ```
 
 ## Development
@@ -190,29 +190,22 @@ Set(1) { 'กรุงเทพมหานคร' }
 1.  Clone the project from github:
 
     ```bash
-    git clone git@github.com:ohoexperience/address.git
+    git clone git@github.com:ohoexperience/ohochat_address_flutter.git
+
     ```
 
 2.  Install the dependencies:
 
     ```bash
-    # npm
-    npm i
-
-    # yarn
-    yarn
-
-    # pnpm
-    pnpm
+    flutter pub get
     ```
 
 ### Testing
-
-`address` has two types of tests:
--   Unit tests: `pnpm test`
--   Coverage tests: `pnpm test-coverage`
+    ```bash
+    flutter test
+    ```
 
 
 ## Data Source
 
-The address data is sourced from and managed by [thailand-geography-json](https://github.com/thailand-geography-data/thailand-geography-json). Kudos to the team for their great works!
+The address data is sourced from and managed by thailand-geography-json. Kudos to the team for their great work!
