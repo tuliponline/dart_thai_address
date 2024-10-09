@@ -1,4 +1,0 @@
-# melos_managed_dependency_overrides: ohochat_address
-dependency_overrides:
-  ohochat_address:
-    path: ..

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:ohochat_address/resources.resource_importer.dart';
+import 'package:ohochat_address/src/resources.resource_importer.dart';
 
 import 'model.dart';
 
@@ -19,11 +19,7 @@ class Location {
             district[0] as String,
             district[1] as int,
             (district[2] as List<dynamic>).map((subDistrict) {
-              return (
-                subDistrict[0] as String,
-                subDistrict[1] as int,
-                List<int>.from(subDistrict[2] as List<dynamic>)
-              );
+              return (subDistrict[0] as String, subDistrict[1] as int, List<int>.from(subDistrict[2] as List<dynamic>));
             }).toList()
           );
         }).toList()
@@ -57,15 +53,11 @@ class Location {
 
   List<DatabaseSchema> get database => _database;
 
-  List<DatabaseSchema> combineQuery(
-      List<ComposisCondition<DatabaseSchema>> queries) {
-    return _database
-        .where((row) => queries.every((query) => query(row)))
-        .toList();
+  List<DatabaseSchema> combineQuery(List<ComposisCondition<DatabaseSchema>> queries) {
+    return _database.where((row) => queries.every((query) => query(row))).toList();
   }
 
-  List<ComposisCondition<DatabaseSchema>> createQueryArray(
-      DatabaseSchemaQuery? option) {
+  List<ComposisCondition<DatabaseSchema>> createQueryArray(DatabaseSchemaQuery? option) {
     final queries = <ComposisCondition<DatabaseSchema>>[];
 
     if (option != null) {
@@ -73,18 +65,12 @@ class Location {
         if (entry.value == null) continue;
         queries.add((row) {
           final rowJson = row.toJson();
-          return ['provinceCode', 'districtCode', 'subDistrictCode']
-                  .contains(entry.key)
+          return ['provinceCode', 'districtCode', 'subDistrictCode'].contains(entry.key)
               ? rowJson[entry.key] == entry.value
-              : ['provinceName', 'districtName', 'subDistrictName']
-                      .contains(entry.key)
-                  ? rowJson[entry.key]
-                      .toString()
-                      .startsWith(entry.value.toString())
+              : ['provinceName', 'districtName', 'subDistrictName'].contains(entry.key)
+                  ? rowJson[entry.key].toString().startsWith(entry.value.toString())
                   : entry.key == 'postalCode'
-                      ? rowJson[entry.key]
-                          .toString()
-                          .startsWith(entry.value.toString())
+                      ? rowJson[entry.key].toString().startsWith(entry.value.toString())
                       : false;
         });
       }
@@ -113,8 +99,7 @@ class Location {
     return [] as List<T>;
   }
 
-  reduce<Init>(
-      DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
+  reduce<Init>(DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
     final queries = createQueryArray(option);
     final res = combineQuery(queries);
 

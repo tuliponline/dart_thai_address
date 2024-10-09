@@ -1,21 +1,62 @@
-// import 'package:test/test.dart';
+import 'package:test/test.dart';
+import 'package:ohochat_address/ohochat_address.dart';
 
-// import 'package:dart_address/address.dart';
-
+//  dart run packages/ohochat_address/test/address_test.dart
 void main() {
-  // group('A group of tests', () {
-  //   final location = Location();
+  group('group of tests location', () {
+    final location = Location();
 
-  //   setUp(() {
-  //     // Additional setup goes here.
-  //   });
+    test('Test location execute', () {
+      List<DatabaseSchema> results = location.execute(DatabaseSchemaQuery(
+        postalCode: '10270',
+        subDistrictName: 'ปากน้ำ',
+      ));
 
-  //   test('First Test', () {
-  //     DatabaseSchemaQuery option =
-  //         DatabaseSchemaQuery(postalCode: '10270', provinceName: "กรุง");
-  //     print(location.reduce(option, (a, c) {
-  //       return a;
-  //     }, 0));
-  //   });
-  // });
+      Map<String, dynamic> resJson = results.first.toJson();
+
+      expect(
+        {
+          'provinceCode': 11,
+          "provinceName": "สมุทรปราการ",
+          "districtCode": 1101,
+          "districtName": "เมืองสมุทรปราการ",
+          "subDistrictCode": 110101,
+          "subDistrictName": "ปากน้ำ",
+          "postalCode": "10270"
+        },
+        resJson,
+      );
+    });
+
+    test('Test location reduce', () {
+      var results = location.reduce(DatabaseSchemaQuery(provinceName: 'กรุง', districtName: 'บางนา'), (acc, row) {
+        acc['provinceName']!.add(row.provinceName);
+        return acc;
+      }, {"provinceName": <String>{}});
+
+      expect(
+        {
+          'provinceName': {'กรุงเทพมหานคร'}
+        },
+        results,
+      );
+    });
+
+    test('Test location map', () {
+      var resJson = location.map(
+        DatabaseSchemaQuery(provinceName: 'กรุง', districtName: 'บางนา'),
+        (row) {
+          return "${row.subDistrictName}-${row.districtName}-${row.provinceName}-${row.postalCode}";
+        },
+      );
+
+      expect(
+        [
+          "บางนาเหนือ-บางนา-กรุงเทพมหานคร-10260",
+          "บางนาใต้-บางนา-กรุงเทพมหานคร-10260",
+        ],
+        resJson,
+      );
+    });
+  });
 }

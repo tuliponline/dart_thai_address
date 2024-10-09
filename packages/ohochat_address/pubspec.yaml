@@ -6,20 +6,10 @@ repository: https://github.com/ohoexperience/dart_address/tree/main/packages/add
 environment:
   sdk: ^3.5.3
 
-dependencies:
-  flutter:
-    sdk: flutter
-  path: ^1.9.0
-  resource_importer: ^0.2.0
-  
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^4.0.0
-
-flutter:
-  assets:
-      - assets/minify_db.json
+  lints: ^5.0.0
+  test: ^1.25.8
+  resource_importer: ^0.2.0
 
 resource_importer:
   resources:
