@@ -1,16 +1,11 @@
 import 'dart:convert';
-
-import 'package:ohochat_address/src/resources.resource_importer.dart';
-
 import 'model.dart';
+import 'resources.resource_importer.dart';
 
 class Location {
-  final List<DatabaseSchema> _database = [];
-  static final Location _instance = Location._();
-
   Location._() {
-    var decodedJson = jsonDecode(rawDB);
-    MinifyDatabase minifyDB = (decodedJson as List<dynamic>).map((province) {
+    final decodedJson = jsonDecode(rawDB);
+    final MinifyDatabase minifyDB = (decodedJson as List<dynamic>).map((province) {
       return (
         province[0] as String,
         province[1] as int,
@@ -31,25 +26,29 @@ class Location {
         for (final district in province.$3) {
           for (final subDistrict in district.$3) {
             for (final postalCode in subDistrict.$3) {
-              _database.add(DatabaseSchema(
-                provinceName: province.$1,
-                provinceCode: province.$2,
-                districtName: district.$1,
-                districtCode: district.$2,
-                subDistrictName: subDistrict.$1,
-                subDistrictCode: subDistrict.$2,
-                postalCode: '$postalCode',
-              ));
+              _database.add(
+                DatabaseSchema(
+                  provinceName: province.$1,
+                  provinceCode: province.$2,
+                  districtName: district.$1,
+                  districtCode: district.$2,
+                  subDistrictName: subDistrict.$1,
+                  subDistrictCode: subDistrict.$2,
+                  postalCode: '$postalCode',
+                ),
+              );
             }
           }
         }
       }
     }
   }
-
+  // ignore: sort_unnamed_constructors_first
   factory Location() {
     return _instance;
   }
+  final List<DatabaseSchema> _database = [];
+  static final Location _instance = Location._();
 
   List<DatabaseSchema> get database => _database;
 
@@ -62,7 +61,9 @@ class Location {
 
     if (option != null) {
       for (final entry in option.toJson().entries) {
-        if (entry.value == null) continue;
+        if (entry.value == null) {
+          continue;
+        }
         queries.add((row) {
           final rowJson = row.toJson();
           return ['provinceCode', 'districtCode', 'subDistrictCode'].contains(entry.key)
@@ -80,7 +81,9 @@ class Location {
   }
 
   T? detectFunction<T>(dynamic cb, {required bool init}) {
-    if (cb is Function) return cb as T;
+    if (cb is Function) {
+      return cb as T;
+    }
     return null;
   }
 
@@ -99,7 +102,7 @@ class Location {
     return [] as List<T>;
   }
 
-  reduce<Init>(DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
+  Init reduce<Init>(DatabaseSchemaQuery option, ReduceCallback<Init> callback, Init init) {
     final queries = createQueryArray(option);
     final res = combineQuery(queries);
 
@@ -107,6 +110,6 @@ class Location {
       return res.fold<Init>(init, callback);
     }
 
-    return null;
+    return init;
   }
 }

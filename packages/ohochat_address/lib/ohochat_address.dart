@@ -1,7 +1,7 @@
 /// Support for doing something awesome.
 ///
 /// More dartdocs go here.
-library ohochat_address;
+library;
 
 export 'src/address_base.dart';
 export 'src/model.dart';
