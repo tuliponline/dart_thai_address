@@ -1,6 +1,10 @@
 name: ohochat_address
-description: "A no-nonsense Thailand address helper."
-version: 0.0.1+rc1
+description: |
+  A lightweight and efficient Thailand address helper for Flutter, 
+  designed to simplify address handling for Thai locations. With this package, 
+  you can quickly build address-based features without dealing with complex data relationships. 
+  It supports mobile, web, and desktop platforms, making it a versatile choice for any Flutter project.
+version: 0.0.1+rc3
 
 repository: https://github.com/ohoexperience/dart_address/tree/main/packages/address
 environment:
