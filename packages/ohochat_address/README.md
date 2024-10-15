@@ -124,8 +124,6 @@ You can mix exact and partial matches in a single query. Otherwise, you can pass
 // Get address details
 final results = location.execute(DatabaseSchemaQuery(postalCode: '10270',provinceName:'สมุทร'));
 
-
-
 // results1
 [
     {
@@ -142,37 +140,35 @@ final results = location.execute(DatabaseSchemaQuery(postalCode: '10270',provinc
 
 // Get address details and mapping data
 const results2 = location.reduce(
-    DatabaseSchemaQuery(
-        provinceName: 'กรุง',
-        districtName: 'บางนา',
-        subDistrictName: 'บางนาใต้',
-    ),
-    (row) => ({ a: `${row.provinceName} ${row.postalCode}` }),
-)
+        DatabaseSchemaQuery(provinceName: 'กรุง', districtName: 'บางนา'),
+        (acc, row) {
+          acc['provinceName']!.add(row.provinceName);
+          return acc;
+        },
+        {'provinceName': <String>{}},
+      );
+
 // results2
 [
     {
-        a: 'กรุงเทพมหานคร 10260',
+        'provinceName': {'กรุงเทพมหานคร'},
     },
 ]
 
 
 // Get address detail and restucture data
-const results3 = location.reduce(
-     DatabaseSchemaQuery(
-        provinceName: 'กรุง',
-        districtName: 'บางนา',
-    ),
-    (acc, row) => {
-        acc['provinceName'].add(row.provinceName)
-        return acc
-    },
-    {
-        "provinceName": <String>{},
-    }
-)
+const results3 = llocation.map(
+        DatabaseSchemaQuery(provinceName: 'กรุง', districtName: 'บางนา'),
+        (row) {
+          return '${row.subDistrictName}-${row.districtName}-${row.provinceName}-${row.postalCode}';
+        },
+    );
+
 // results3
-{ "provinceName" : ({ 'กรุงเทพมหานคร' })}
+[
+    'บางนาเหนือ-บางนา-กรุงเทพมหานคร-10260',
+    'บางนาใต้-บางนา-กรุงเทพมหานคร-10260',
+],
 ```
 
 ## Development
@@ -189,13 +185,13 @@ const results3 = location.reduce(
 2.  Install the dependencies:
 
     ```bash
-    flutter pub get
+    dart pub get
     ```
 
 ### Testing
-    ```bash
-    flutter test
-    ```
+```bash
+dart run ../address_test.dart
+```
 
 
 ## Data Source
