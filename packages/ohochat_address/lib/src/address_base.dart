@@ -12,7 +12,8 @@ class Location {
   Location._() {
     // Decode raw JSON data and convert it into structured data.
     final decodedJson = jsonDecode(rawDB);
-    final MinifyDatabase minifyDB = (decodedJson as List<dynamic>).map((province) {
+    final MinifyDatabase minifyDB =
+        (decodedJson as List<dynamic>).map((province) {
       return (
         province[0] as String,
         province[1] as int,
@@ -21,7 +22,11 @@ class Location {
             district[0] as String,
             district[1] as int,
             (district[2] as List<dynamic>).map((subDistrict) {
-              return (subDistrict[0] as String, subDistrict[1] as int, List<int>.from(subDistrict[2] as List<dynamic>));
+              return (
+                subDistrict[0] as String,
+                subDistrict[1] as int,
+                List<int>.from(subDistrict[2] as List<dynamic>)
+              );
             }).toList()
           );
         }).toList()
@@ -65,7 +70,9 @@ class Location {
   List<DatabaseSchema> combineQuery(
     List<ComposisCondition<DatabaseSchema>> queries,
   ) {
-    return _database.where((row) => queries.every((query) => query(row))).toList();
+    return _database
+        .where((row) => queries.every((query) => query(row)))
+        .toList();
   }
 
   /// Creates an array of query conditions based on the provided options.
@@ -81,12 +88,18 @@ class Location {
         }
         queries.add((row) {
           final rowJson = row.toJson();
-          return ['provinceCode', 'districtCode', 'subDistrictCode'].contains(entry.key)
+          return ['provinceCode', 'districtCode', 'subDistrictCode']
+                  .contains(entry.key)
               ? rowJson[entry.key] == entry.value
-              : ['provinceName', 'districtName', 'subDistrictName'].contains(entry.key)
-                  ? rowJson[entry.key].toString().startsWith(entry.value.toString())
+              : ['provinceName', 'districtName', 'subDistrictName']
+                      .contains(entry.key)
+                  ? rowJson[entry.key]
+                      .toString()
+                      .startsWith(entry.value.toString())
                   : entry.key == 'postalCode'
-                      ? rowJson[entry.key].toString().startsWith(entry.value.toString())
+                      ? rowJson[entry.key]
+                          .toString()
+                          .startsWith(entry.value.toString())
                       : false;
         });
       }
