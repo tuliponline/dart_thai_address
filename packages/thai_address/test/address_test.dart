@@ -1,7 +1,8 @@
-import 'package:ohochat_address/ohochat_address.dart';
-import 'package:test/test.dart';
-
 //  dart run packages/ohochat_address/test/address_test.dart
+
+import 'package:test/test.dart';
+import '../lib/thai_address.dart';
+
 void main() {
   group('group of tests location', () {
     final location = Location();
@@ -62,6 +63,48 @@ void main() {
           'บางนาใต้-บางนา-กรุงเทพมหานคร-10260',
         ],
         resJson,
+      );
+    });
+
+    test('Test location getAllProvinces', () {
+      final result = location.getAllProvinces();
+
+      final Map<String, dynamic> resJson = result.first.toJson();
+      print(result.length);
+      for (var i = 0; i < result.length; i++) {
+        print(result[i].toJson());
+      }
+      expect(
+        true,
+        result.isNotEmpty,
+      );
+    });
+
+    test('Test location getAllDistricts', () {
+      final result = location.getDistrictsByProvinceCode('47');
+
+      final Map<String, dynamic> resJson = result.first.toJson();
+      print(result.length);
+      for (var i = 0; i < result.length; i++) {
+        print(result[i].toJson());
+      }
+      expect(
+        true,
+        result.isNotEmpty,
+      );
+    });
+
+    test('Test location getAllSubDistricts', () {
+      final result = location.getSubDistrictsByDistrictCode('4711');
+
+      final Map<String, dynamic> resJson = result.first.toJson();
+      print(result.length);
+      for (var i = 0; i < result.length; i++) {
+        print(result[i].toJson());
+      }
+      expect(
+        true,
+        result.isNotEmpty,
       );
     });
   });

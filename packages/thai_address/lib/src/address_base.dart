@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'district_model.dart';
 import 'model.dart';
+import 'province_model.dart';
 import 'resources.resource_importer.dart';
+import 'subdistrict_model.dart';
 
 /// Singleton class for managing and querying address data.
 class Location {
@@ -59,6 +62,54 @@ class Location {
 
   /// A list of all database schema elements.
   final List<DatabaseSchema> _database = [];
+
+  List<ProvinceModel> getAllProvinces() {
+    final provinces = <String, ProvinceModel>{};
+    for (final entry in _database) {
+      provinces.putIfAbsent(
+        entry.provinceName,
+        () => ProvinceModel(
+          provinceNameTh: entry.provinceName,
+          provinceCode: entry.provinceCode.toString(),
+        ),
+      );
+    }
+    return provinces.values.toList();
+  }
+
+  List<DistrictModel> getDistrictsByProvinceCode(String provinceCode) {
+    final districts = <String, DistrictModel>{};
+
+    for (final entry in _database) {
+      if (entry.provinceCode.toString() == provinceCode) {
+        districts.putIfAbsent(
+          entry.districtName,
+          () => DistrictModel(
+            districtNameTh: entry.districtName,
+            districtCode: entry.districtCode.toString(),
+          ),
+        );
+      }
+    }
+    return districts.values.toList();
+  }
+
+  List<SubdistrictModel> getSubDistrictsByDistrictCode(String districtCode) {
+    final subDistricts = <String, SubdistrictModel>{};
+    for (final entry in _database) {
+      if (entry.districtCode.toString() == districtCode) {
+        subDistricts.putIfAbsent(
+          entry.subDistrictName,
+          () => SubdistrictModel(
+            subdistrictNameTh: entry.subDistrictName,
+            subdistrictCode: entry.subDistrictCode.toString(),
+            postalCode: entry.postalCode,
+          ),
+        );
+      }
+    }
+    return subDistricts.values.toList();
+  }
 
   // Singleton instance.
   static final Location _instance = Location._();

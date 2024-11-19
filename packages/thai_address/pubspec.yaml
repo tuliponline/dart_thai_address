@@ -1,4 +1,4 @@
-name: ohochat_address
+name: thai_address
 version: 1.0.0
 
 description: |
@@ -8,12 +8,9 @@ description: |
 topics:
   - address
   - thailand
-  - ohochat
   - location
   - input
 
-homepage: https://github.com/ohoexperience/dart_address/tree/main/packages/ohochat_address
-repository: https://github.com/ohoexperience/dart_address/tree/main/packages/ohochat_address
 
 environment:
   sdk: ^3.5.3

@@ -1,4 +1,4 @@
-import 'package:ohochat_address/ohochat_address.dart';
+import '../lib/thai_address.dart';
 
 // dart run packages/ohochat_address/example/ohochat_address.dart
 void main() {
