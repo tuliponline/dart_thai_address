@@ -1,11 +1,7 @@
 # Address for Thailand
 
-[![pub package](https://img.shields.io/pub/v/ohochat_address.svg?style=flat)](https://pub.dev/packages/ohochat_address)
-[![Flutter](https://img.shields.io/badge/Platform-Flutter-blue.svg)](https://flutter.dev)
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
-[![Pub points](https://img.shields.io/pub/points/ohochat_address)](https://pub.dev/packages/ohochat_address/score)
 
-Introducing `ohochat_address` — a no-nonsense Thailand address helper for Flutter.
+Introducing `thai_address` — a no-nonsense Thailand address helper for Flutter.
 
 This lightweight package empowers you to focus on building address features faster, eliminating the complexity of address handling. It is framework-agnostic and works seamlessly across platforms in any Flutter application.
 
@@ -19,7 +15,7 @@ This package is designed and brought to you by [Oho Chat](https://www.oho.chat) 
 
 ## Features
 
-By using `ohochat_address`, you'll enjoy:
+By using `thai_address`, you'll enjoy:
 
 - Efficient address lookup for Thai provinces, districts, and sub-districts.
 - Flexible queries that handle both partial and exact address matching.
@@ -40,7 +36,7 @@ Use **Location** to find addresses with search constraints.
 ### Creating an instance
 
 ```dart
-import 'package:ohochat_address/ohochat_address.dart';
+import 'package:thai_address/thai_address.dart';
 
 final location = Location();
 ```
@@ -193,11 +189,3 @@ const results3 = llocation.map(
 dart run ../address_test.dart
 ```
 
-
-## Data Source
-
-The address data is sourced from and managed by [thailand-geography-json](https://github.com/thailand-geography-data/thailand-geography-json). Kudos to the team for their great works!
-
-## License
-
-MIT © [Oho Chat](https://github.com/ohoexperience). See [LICENSE](https://github.com/ohoexperience/address/blob/main/LICENSE) for details.
